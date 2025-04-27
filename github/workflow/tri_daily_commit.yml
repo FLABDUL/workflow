@@ -1,39 +1,64 @@
 name: Hakim's Tri-Daily Commit
 
+# This defines when the workflow should run.
 on:
   schedule:
-    - cron: '0 0 * * *'  # This runs every day at midnight UTC
-    # To run every 3 days at midnight UTC:
+    # This cron expression runs the action every day at midnight UTC.
+    # If you want to run the action every 3 days at midnight UTC, you can uncomment the following line.
+    - cron: '0 0 * * *'  # Runs every day at midnight UTC
+    # Uncomment below to run every 3 days at midnight UTC
     # - cron: '0 0 */3 * *'
 
 jobs:
   commit:
+    # The job runs on the latest version of Ubuntu
     runs-on: ubuntu-latest
 
     steps:
+    # Step 1: Checkout repository to work on
     - name: Checkout repository
       uses: actions/checkout@v2
       with:
-        ref: main
+        ref: master  # Checkout the main branch of the repository
 
+    # Step 2: Create file and commit the changes
     - name: Create file and commit
       run: |
+        # Define the file name to be created/updated
         FILE="commit_number.md"
+        
+        # Check if the file exists. If not, create it and set the initial commit number
         if [ ! -f "$FILE" ]; then
           echo "Hello, my name is Abdul Hakim Norazman" > "$FILE"
-          echo "commit number: 1" >> "$FILE"
+          echo "commit number: 1" >> "$FILE"  # Start the commit number at 1
         else
+          # If the file exists, read the current commit number from the file
           CURRENT_COUNT=$(grep -oP 'commit number: \K\d+' "$FILE")
+          
+          # If no commit number is found, default to 0
           if [ -z "$CURRENT_COUNT" ]; then
             CURRENT_COUNT=0
           fi
+          
+          # Increment the commit number by 1
           NEXT_COUNT=$((CURRENT_COUNT + 1))
+          
+          # Update the file with the new commit number
           sed -i "/commit number: /c\commit number: $NEXT_COUNT" "$FILE"
         fi
+        
+        # Set Git user information for the commit
         git config --global user.name "Abdul Hakim Norazman"
         git config --global user.email "ahnorazman@gmail.com"
+
+        # Add the modified file to the commit
         git add "$FILE"
+
+        # Commit the changes with a message
         git commit -m "Hello, my name is Abdul Hakim Norazman nice to meet you"
+        
+        # Push the commit to the GitHub repository
         git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/FLABDUL/workflow.git
       env:
+        # Set the GITHUB_TOKEN as an environment variable to authenticate the commit push
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
