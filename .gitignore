@@ -9,5 +9,5 @@ __pycache__/
 *.pyc
 *.pyo
 
-# Ignore GitHub folder if it's unnecessary
-github/
+## Ignore GitHub folder if it's unnecessary
+#github/
