@@ -1,0 +1,13 @@
+# Ignore JetBrains IDEs project files
+.idea/
+
+# Ignore virtual environment directories
+.venv/
+
+# You can add other typical ignore patterns for Python or your specific use case
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore GitHub folder if it's unnecessary
+github/
