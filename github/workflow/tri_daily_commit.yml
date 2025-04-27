@@ -2,6 +2,7 @@ name: Hakim's Tri-Daily Commit
 
 # This defines when the workflow should run.
 on:
+  workflow_dispatch:  # This enables manual triggers
   schedule:
     # This cron expression runs the action every day at midnight UTC.
     # If you want to run the action every 3 days at midnight UTC, you can uncomment the following line.
