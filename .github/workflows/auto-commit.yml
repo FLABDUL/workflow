@@ -35,7 +35,10 @@ jobs:
         env:
           TOKEN: ${{ secrets.PERSONAL_TOKEN }}
         run: |
+          git config user.name "FLABDUL"
+          git config user.email "your_username@users.noreply.github.com"
           git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
           git add last_update.txt README.md automation.log
           git commit -m "🤖 Auto-update @ $(date -u)"
           git push origin HEAD
+
