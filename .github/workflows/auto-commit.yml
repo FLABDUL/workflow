@@ -2,11 +2,11 @@ name: 🚀 Advanced Auto Commit Bot
 
 on:
   schedule:
-    - cron: '0 0 */3 * *'  # Every 3 days at midnight
+    - cron: '0 0 */3 * *'  # Every 3 days at midnight UTC
   push:
     branches:
       - main
-  workflow_dispatch:  # Manual trigger
+  workflow_dispatch:  # Manual run from GitHub UI
   pull_request:
     types: [closed]
 
@@ -29,16 +29,13 @@ jobs:
       - name: ⚙️ Set up Git identity
         run: |
           git config user.name "FLABDUL"
-          git config user.email "ahnorazman@gmail.com"
+          git config user.email "FLABDUL@users.noreply.github.com"
 
       - name: 💾 Commit and Push (via PAT)
         env:
           TOKEN: ${{ secrets.PERSONAL_TOKEN }}
         run: |
-          git config user.name "FLABDUL"
-          git config user.email "your_username@users.noreply.github.com"
           git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
           git add last_update.txt README.md automation.log
           git commit -m "🤖 Auto-update @ $(date -u)"
           git push origin HEAD
-
