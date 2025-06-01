@@ -35,11 +35,17 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: 💾 Commit and Push
+      - name: 💾 Commit and Push (via PAT)
+        env:
+          TOKEN: ${{ secrets.PERSONAL_TOKEN }}
         run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
           git add last_update.txt README.md automation.log
           git commit -m "🤖 Auto-update @ $(date -u)"
-          git push
+          git push origin HEAD
+
 
       - name: 🔔 Send webhook to Discord (optional)
         if: env.DISCORD_WEBHOOK != ''
