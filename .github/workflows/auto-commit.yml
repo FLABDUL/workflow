@@ -1,33 +1,43 @@
-name: 🔁 Push Test
+name: 🚀 Advanced Auto Commit Bot
 
 on:
-  workflow_dispatch:
+  schedule:
+    - cron: '0 0 */3 * *'  # Every 3 days at midnight UTC
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Manual trigger from UI
+  pull_request:
+    types: [closed]
 
 jobs:
-  push-test:
+  auto-commit:
+    if: github.event.pull_request.merged == true || github.event_name != 'pull_request'
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v4
         with:
-          persist-credentials: false  # ⛔ prevents auth override
+          persist-credentials: false  # ⛔ disable GITHUB_TOKEN override
 
-
-      - name: Make test file
-        run: echo "Pushed on $(date -u)" > push_test.txt
-
-      - name: 🔍 Debug Git remote info
+      - name: 📝 Update README and log
         run: |
-          git remote -v
-          git remote show origin
+          TIMESTAMP=$(date -u)
+          echo "🤖 Last auto update: $TIMESTAMP" > last_update.txt
+          echo "🔄 Updated by bot on $TIMESTAMP" > README.md
+          echo "$TIMESTAMP - Commit by GitHub Action" >> automation.log
 
-      - name: Git setup and push test
-        env:
-          TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+      - name: ⚙️ Set up Git identity
         run: |
           git config user.name "FLABDUL"
           git config user.email "FLABDUL@users.noreply.github.com"
+
+      - name: 💾 Commit and Push (via Classic PAT)
+        env:
+          TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+        run: |
           git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
-          git add push_test.txt
-          git commit -m "Push test @ $(date -u)"
+          git add last_update.txt README.md automation.log
+          git commit -m "🤖 Auto-update @ $(date -u)"
           git push origin HEAD
