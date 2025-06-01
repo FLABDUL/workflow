@@ -9,6 +9,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false  # ⛔ prevents auth override
+
 
       - name: Make test file
         run: echo "Pushed on $(date -u)" > push_test.txt
