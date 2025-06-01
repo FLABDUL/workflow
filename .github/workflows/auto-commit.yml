@@ -23,11 +23,7 @@ jobs:
         run: |
           TIMESTAMP=$(date -u)
           echo "🤖 Last auto update: $TIMESTAMP" > last_update.txt
-
-          # Update README.md
           echo "🔄 Updated by bot on $TIMESTAMP" > README.md
-
-          # Append log
           echo "$TIMESTAMP - Commit by GitHub Action" >> automation.log
 
       - name: ⚙️ Set up Git identity
@@ -39,20 +35,7 @@ jobs:
         env:
           TOKEN: ${{ secrets.PERSONAL_TOKEN }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
           git add last_update.txt README.md automation.log
           git commit -m "🤖 Auto-update @ $(date -u)"
           git push origin HEAD
-
-
-      - name: 🔔 Send webhook to Discord (optional)
-        if: env.DISCORD_WEBHOOK != ''
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        run: |
-          curl -H "Content-Type: application/json" \
-            -X POST \
-            -d "{\"content\": \"✅ Bot committed an update on $(date -u).\"}" \
-            $DISCORD_WEBHOOK
