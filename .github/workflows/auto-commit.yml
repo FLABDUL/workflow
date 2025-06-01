@@ -13,6 +13,11 @@ jobs:
       - name: Make test file
         run: echo "Pushed on $(date -u)" > push_test.txt
 
+      - name: 🔍 Debug Git remote info
+        run: |
+          git remote -v
+          git remote show origin
+
       - name: Git setup and push test
         env:
           TOKEN: ${{ secrets.PERSONAL_TOKEN }}
