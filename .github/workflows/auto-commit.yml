@@ -1,29 +1,52 @@
-name: 🕒 Auto Commit Every 3 Days
+name: 🚀 Advanced Auto Commit Bot
 
 on:
   schedule:
-    - cron: '0 0 */3 * *'  # Every 3 days at midnight UTC
-  workflow_dispatch:  # Allow manual trigger too
+    - cron: '0 0 */3 * *'  # Every 3 days at midnight
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Manual trigger
+  pull_request:
+    types: [closed]
 
 jobs:
   auto-commit:
+    if: github.event.pull_request.merged == true || github.event_name != 'pull_request'
     runs-on: ubuntu-latest
 
     steps:
-      - name: ⬇️ Checkout repo
+      - name: ⬇️ Checkout code
         uses: actions/checkout@v4
 
-      - name: 🛠️ Make a dummy change
+      - name: 📝 Update README and log
         run: |
-          echo "Last update: $(date)" > last_update.txt
+          TIMESTAMP=$(date -u)
+          echo "🤖 Last auto update: $TIMESTAMP" > last_update.txt
 
-      - name: ⚙️ Set Git config
+          # Update README.md
+          echo "🔄 Updated by bot on $TIMESTAMP" > README.md
+
+          # Append log
+          echo "$TIMESTAMP - Commit by GitHub Action" >> automation.log
+
+      - name: ⚙️ Set up Git identity
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: 📦 Commit and Push
+      - name: 💾 Commit and Push
         run: |
-          git add last_update.txt
-          git commit -m "🤖 Automated commit: $(date)"
+          git add last_update.txt README.md automation.log
+          git commit -m "🤖 Auto-update @ $(date -u)"
           git push
+
+      - name: 🔔 Send webhook to Discord (optional)
+        if: env.DISCORD_WEBHOOK != ''
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d "{\"content\": \"✅ Bot committed an update on $(date -u).\"}" \
+            $DISCORD_WEBHOOK
