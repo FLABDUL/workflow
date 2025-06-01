@@ -1,47 +1,25 @@
-name: 🚀 Advanced Auto Commit Bot
+name: 🔁 Push Test
 
 on:
-  schedule:
-    - cron: '0 0 */3 * *'  # Every 3 days at midnight UTC
-  push:
-    branches:
-      - main
-  workflow_dispatch:  # Manual run from GitHub UI
-  pull_request:
-    types: [closed]
+  workflow_dispatch:
 
 jobs:
-  auto-commit:
-    if: github.event.pull_request.merged == true || github.event_name != 'pull_request'
+  push-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: ⬇️ Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: 📝 Update README and log
-        run: |
-          TIMESTAMP=$(date -u)
-          echo "🤖 Last auto update: $TIMESTAMP" > last_update.txt
-          echo "🔄 Updated by bot on $TIMESTAMP" > README.md
-          echo "$TIMESTAMP - Commit by GitHub Action" >> automation.log
+      - name: Make test file
+        run: echo "Pushed on $(date -u)" > push_test.txt
 
-      - name: ⚙️ Set up Git identity
+      - name: Git setup and push test
+        env:
+          TOKEN: ${{ secrets.PERSONAL_TOKEN }}
         run: |
           git config user.name "FLABDUL"
           git config user.email "FLABDUL@users.noreply.github.com"
-
-      - name: 🔍 Debug - Is token injected?
-        env:
-          TOKEN: ${{ secrets.PERSONAL_TOKEN }}
-        run: |
-          echo "TOKEN length: ${#TOKEN}"
-
-      - name: 💾 Commit and Push (via PAT)
-        env:
-          TOKEN: ${{ secrets.PERSONAL_TOKEN }}
-        run: |
           git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
-          git add last_update.txt README.md automation.log
-          git commit -m "🤖 Auto-update @ $(date -u)"
+          git add push_test.txt
+          git commit -m "Push test @ $(date -u)"
           git push origin HEAD
