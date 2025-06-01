@@ -1,0 +1,29 @@
+name: 🕒 Auto Commit Every 3 Days
+
+on:
+  schedule:
+    - cron: '0 0 */3 * *'  # Every 3 days at midnight UTC
+  workflow_dispatch:  # Allow manual trigger too
+
+jobs:
+  auto-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Make a dummy change
+        run: |
+          echo "Last update: $(date)" > last_update.txt
+
+      - name: ⚙️ Set Git config
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: 📦 Commit and Push
+        run: |
+          git add last_update.txt
+          git commit -m "🤖 Automated commit: $(date)"
+          git push
