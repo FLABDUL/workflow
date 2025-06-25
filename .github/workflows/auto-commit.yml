@@ -6,7 +6,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:  # Manual trigger from UI
+  workflow_dispatch:
   pull_request:
     types: [closed]
 
@@ -19,7 +19,7 @@ jobs:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v4
         with:
-          persist-credentials: false  # ⛔ disable GITHUB_TOKEN override
+          persist-credentials: false
 
       - name: 📝 Update README and log
         run: |
@@ -33,11 +33,11 @@ jobs:
           git config user.name "FLABDUL"
           git config user.email "FLABDUL@users.noreply.github.com"
 
-      - name: 💾 Commit and Push (via Classic PAT)
+      - name: 💾 Commit and Force Push (via Classic PAT)
         env:
           TOKEN: ${{ secrets.PERSONAL_TOKEN }}
         run: |
           git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
           git add last_update.txt README.md automation.log
           git commit -m "🤖 Auto-update @ $(date -u)"
-          git push origin HEAD
+          git push origin HEAD --force
